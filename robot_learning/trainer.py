@@ -166,7 +166,7 @@ class Trainer(object):
                     )
                     self._log_test(step, ep_info)
 
-                if update_iter % config.ckpt_interval == 0:
+                if update_iter % config.ckpt_interval == 1:
                     self._save_ckpt(step, {"update_iter": update_iter})
 
         # store the final model
@@ -180,6 +180,9 @@ class Trainer(object):
         ckpt_info = self._load_ckpt(self._config.init_ckpt_path, self._config.ckpt_num)
         step = ckpt_info.get("step", 0)
         update_iter = ckpt_info.get("update_iter", 0)
+
+        # sync the networks across the cpus
+        self._agent.sync_networks()
 
         logger.info(
             "Run %d evaluations at step=%d, update_iter=%d",
